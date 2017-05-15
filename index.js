@@ -2,7 +2,8 @@
  * Helpers.
  */
 
-var s = 1000;
+var s = 1;
+var ms = s * 0.001;
 var m = s * 60;
 var h = m * 60;
 var d = h * 24;
@@ -56,7 +57,7 @@ function parse(str) {
     return;
   }
   var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
+  var type = (match[2] || 's').toLowerCase();
   switch (type) {
     case 'years':
     case 'year':
@@ -85,13 +86,13 @@ function parse(str) {
     case 'secs':
     case 'sec':
     case 's':
-      return n * s;
+      return n;
     case 'milliseconds':
     case 'millisecond':
     case 'msecs':
     case 'msec':
     case 'ms':
-      return n;
+      return n * ms;
     default:
       return undefined;
   }
@@ -105,48 +106,51 @@ function parse(str) {
  * @api private
  */
 
-function fmtShort(ms) {
-  if (ms >= d) {
-    return Math.round(ms / d) + 'd';
+function fmtShort(s) {
+  if (s >= d) {
+    return Math.round(s / d) + 'd';
   }
-  if (ms >= h) {
-    return Math.round(ms / h) + 'h';
+  if (s >= h) {
+    return Math.round(s / h) + 'h';
   }
-  if (ms >= m) {
-    return Math.round(ms / m) + 'm';
+  if (s >= m) {
+    return Math.round(s / m) + 'm';
   }
-  if (ms >= s) {
-    return Math.round(ms / s) + 's';
-  }
-  return ms + 'ms';
+  return s + 's';
 }
 
 /**
- * Long format for `ms`.
+ * Long format for `s`.
  *
- * @param {Number} ms
+ * @param {Number} s
  * @return {String}
  * @api private
  */
 
-function fmtLong(ms) {
-  return plural(ms, d, 'day') ||
-    plural(ms, h, 'hour') ||
-    plural(ms, m, 'minute') ||
-    plural(ms, s, 'second') ||
-    ms + ' ms';
+function fmtLong(s) {
+  return (
+    plural(s, d, 'day') ||
+    plural(s, h, 'hour') ||
+    plural(s, m, 'minute') ||
+    plural(s, s, 'second')
+  );
 }
 
 /**
  * Pluralization helper.
  */
 
-function plural(ms, n, name) {
-  if (ms < n) {
+function plural(s, n, name) {
+  if (name === 'second') {
+    return s > 1 ? s + ' seconds' : s + ' second';
+  }
+
+  if (s < n) {
     return;
   }
-  if (ms < n * 1.5) {
-    return Math.floor(ms / n) + ' ' + name;
+
+  if (s < n * 1.5) {
+    return Math.floor(s / n) + ' ' + name;
   }
-  return Math.ceil(ms / n) + ' ' + name + 's';
+  return Math.ceil(s / n) + ' ' + name + 's';
 }

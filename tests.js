@@ -5,217 +5,204 @@
 
 if (typeof require !== 'undefined') {
   expect = require('expect.js');
-  ms = require('./');
+  seconds = require('./');
 }
 
 // strings
 
-describe('ms(string)', function() {
+describe('seconds(string)', function() {
   it('should not throw an error', function() {
     expect(function() {
-      ms('1m');
+      seconds('1m');
     }).to.not.throwError();
   });
 
-  it('should preserve ms', function() {
-    expect(ms('100')).to.be(100);
+  it('should preserve seconds', function() {
+    expect(seconds('100')).to.be(100);
   });
 
-  it('should convert from m to ms', function() {
-    expect(ms('1m')).to.be(60000);
+  it('should convert from ms to seconds', function() {
+    expect(seconds('1000ms')).to.be(1);
   });
 
-  it('should convert from h to ms', function() {
-    expect(ms('1h')).to.be(3600000);
+  it('should convert from m to seconds', function() {
+    expect(seconds('1m')).to.be(60);
   });
 
-  it('should convert d to ms', function() {
-    expect(ms('2d')).to.be(172800000);
+  it('should convert from h to seconds', function() {
+    expect(seconds('1h')).to.be(3600);
   });
 
-  it('should convert s to ms', function() {
-    expect(ms('1s')).to.be(1000);
-  });
-
-  it('should convert ms to ms', function() {
-    expect(ms('100ms')).to.be(100);
+  it('should convert d to seconds', function() {
+    expect(seconds('2d')).to.be(172800);
   });
 
   it('should work with decimals', function() {
-    expect(ms('1.5h')).to.be(5400000);
+    expect(seconds('1.5h')).to.be(5400);
   });
 
   it('should work with multiple spaces', function() {
-    expect(ms('1   s')).to.be(1000);
+    expect(seconds('1   s')).to.be(1);
   });
 
   it('should return NaN if invalid', function() {
-    expect(isNaN(ms('☃'))).to.be(true);
+    expect(isNaN(seconds('☃'))).to.be(true);
   });
 
   it('should be case-insensitive', function() {
-    expect(ms('1.5H')).to.be(5400000);
+    expect(seconds('1.5H')).to.be(5400);
   });
 
   it('should work with numbers starting with .', function() {
-    expect(ms('.5ms')).to.be(0.5);
+    expect(seconds('.5ms')).to.be(0.0005);
   });
 });
 
 // long strings
 
-describe('ms(long string)', function() {
+describe('seconds(long string)', function() {
   it('should not throw an error', function() {
     expect(function() {
-      ms('53 milliseconds');
+      seconds('53 milliseconds');
     }).to.not.throwError();
   });
 
-  it('should convert milliseconds to ms', function() {
-    expect(ms('53 milliseconds')).to.be(53);
+  it('should convert milliseconds to seconds', function() {
+    expect(seconds('53 milliseconds')).to.be(0.053);
   });
 
-  it('should convert msecs to ms', function() {
-    expect(ms('17 msecs')).to.be(17);
+  it('should convert msecs to seconds', function() {
+    expect(seconds('17 msecs')).to.be(0.017);
   });
 
-  it('should convert sec to ms', function() {
-    expect(ms('1 sec')).to.be(1000);
+  it('should convert sec to seconds', function() {
+    expect(seconds('1 sec')).to.be(1);
   });
 
-  it('should convert from min to ms', function() {
-    expect(ms('1 min')).to.be(60000);
+  it('should convert from min to seconds', function() {
+    expect(seconds('1 min')).to.be(60);
   });
 
-  it('should convert from hr to ms', function() {
-    expect(ms('1 hr')).to.be(3600000);
+  it('should convert from hr to seconds', function() {
+    expect(seconds('1 hr')).to.be(3600);
   });
 
-  it('should convert days to ms', function() {
-    expect(ms('2 days')).to.be(172800000);
+  it('should convert days to seconds', function() {
+    expect(seconds('2 days')).to.be(172800);
   });
 
   it('should work with decimals', function() {
-    expect(ms('1.5 hours')).to.be(5400000);
+    expect(seconds('1.5 hours')).to.be(5400);
   });
 });
 
 // numbers
 
-describe('ms(number, { long: true })', function() {
+describe('seconds(number, { long: true })', function() {
   it('should not throw an error', function() {
     expect(function() {
-      ms(500, { long: true });
+      seconds(500, { long: true });
     }).to.not.throwError();
   });
 
-  it('should support milliseconds', function() {
-    expect(ms(500, { long: true })).to.be('500 ms');
-  });
-
   it('should support seconds', function() {
-    expect(ms(1000, { long: true })).to.be('1 second');
-    expect(ms(1200, { long: true })).to.be('1 second');
-    expect(ms(10000, { long: true })).to.be('10 seconds');
+    expect(seconds(1, { long: true })).to.be('1 second');
+    expect(seconds(35, { long: true })).to.be('35 seconds');
   });
 
   it('should support minutes', function() {
-    expect(ms(60 * 1000, { long: true })).to.be('1 minute');
-    expect(ms(60 * 1200, { long: true })).to.be('1 minute');
-    expect(ms(60 * 10000, { long: true })).to.be('10 minutes');
+    expect(seconds(60, { long: true })).to.be('1 minute');
+    expect(seconds(600, { long: true })).to.be('10 minutes');
   });
 
   it('should support hours', function() {
-    expect(ms(60 * 60 * 1000, { long: true })).to.be('1 hour');
-    expect(ms(60 * 60 * 1200, { long: true })).to.be('1 hour');
-    expect(ms(60 * 60 * 10000, { long: true })).to.be('10 hours');
+    expect(seconds(60 * 60, { long: true })).to.be('1 hour');
+    expect(seconds(60 * 1000, { long: true })).to.be('17 hours');
+    expect(seconds(60 * 1200, { long: true })).to.be('20 hours');
   });
-
+  //
   it('should support days', function() {
-    expect(ms(24 * 60 * 60 * 1000, { long: true })).to.be('1 day');
-    expect(ms(24 * 60 * 60 * 1200, { long: true })).to.be('1 day');
-    expect(ms(24 * 60 * 60 * 10000, { long: true })).to.be('10 days');
+    expect(seconds(24 * 60 * 60, { long: true })).to.be('1 day');
+    expect(seconds(24 * 60 * 60 * 1.2, { long: true })).to.be('1 day');
+    expect(seconds(60 * 10000, { long: true })).to.be('7 days');
+    expect(seconds(24 * 60 * 60 * 10, { long: true })).to.be('10 days');
   });
 
   it('should round', function() {
-    expect(ms(234234234, { long: true })).to.be('3 days');
+    expect(seconds(234234, { long: true })).to.be('3 days');
   });
 });
 
 // numbers
 
-describe('ms(number)', function() {
+describe('seconds(number)', function() {
   it('should not throw an error', function() {
     expect(function() {
-      ms(500);
+      seconds(500);
     }).to.not.throwError();
   });
 
-  it('should support milliseconds', function() {
-    expect(ms(500)).to.be('500ms');
-  });
-
   it('should support seconds', function() {
-    expect(ms(1000)).to.be('1s');
-    expect(ms(10000)).to.be('10s');
+    expect(seconds(10)).to.be('10s');
+    expect(seconds(59)).to.be('59s');
   });
 
   it('should support minutes', function() {
-    expect(ms(60 * 1000)).to.be('1m');
-    expect(ms(60 * 10000)).to.be('10m');
+    expect(seconds(60 * 1)).to.be('1m');
+    expect(seconds(60 * 10)).to.be('10m');
   });
 
   it('should support hours', function() {
-    expect(ms(60 * 60 * 1000)).to.be('1h');
-    expect(ms(60 * 60 * 10000)).to.be('10h');
+    expect(seconds(60 * 60)).to.be('1h');
+    expect(seconds(60 * 60 * 10)).to.be('10h');
   });
 
   it('should support days', function() {
-    expect(ms(24 * 60 * 60 * 1000)).to.be('1d');
-    expect(ms(24 * 60 * 60 * 10000)).to.be('10d');
+    expect(seconds(24 * 60 * 60)).to.be('1d');
+    expect(seconds(24 * 60 * 60 * 10)).to.be('10d');
   });
 
   it('should round', function() {
-    expect(ms(234234234)).to.be('3d');
+    expect(seconds(234234)).to.be('3d');
   });
 });
 
 // invalid inputs
 
-describe('ms(invalid inputs)', function() {
-  it('should throw an error, when ms("")', function() {
+describe('seconds(invalid inputs)', function() {
+  it('should throw an error, when seconds("")', function() {
     expect(function() {
-      ms('');
+      seconds('');
     }).to.throwError();
   });
 
-  it('should throw an error, when ms(undefined)', function() {
+  it('should throw an error, when seconds(undefined)', function() {
     expect(function() {
-      ms(undefined);
+      seconds(undefined);
     }).to.throwError();
   });
 
-  it('should throw an error, when ms(null)', function() {
+  it('should throw an error, when seconds(null)', function() {
     expect(function() {
-      ms(null);
+      seconds(null);
     }).to.throwError();
   });
 
-  it('should throw an error, when ms([])', function() {
+  it('should throw an error, when seconds([])', function() {
     expect(function() {
-      ms([]);
+      seconds([]);
     }).to.throwError();
   });
 
-  it('should throw an error, when ms({})', function() {
+  it('should throw an error, when seconds({})', function() {
     expect(function() {
-      ms({});
+      seconds({});
     }).to.throwError();
   });
 
-  it('should throw an error, when ms(NaN)', function() {
+  it('should throw an error, when seconds(NaN)', function() {
     expect(function() {
-      ms(NaN);
+      seconds(NaN);
     }).to.throwError();
   });
 });
